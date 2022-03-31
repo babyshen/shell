@@ -1,0 +1,11 @@
+#!/bin/bash
+# restart wireguard interface
+
+[[ $# < 1 ]] && {
+    echo -e "\n    $0 WGNAME\n" 
+    exit 1
+}
+
+wgname=$1
+
+wg-quick down $wgname  &&  wg-quick up $wgname
