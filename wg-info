@@ -1,0 +1,88 @@
+#!/bin/bash
+# Wireguard friendly peer names
+
+# [Peer]
+# name = xxx
+# PublicKey = xxx
+# PresharedKey = xxx
+# AllowedIPs = xxx
+
+declare -A pubname
+
+function get_publickey_name() {
+    wg_conf="/etc/wireguard/${wgname}.conf"
+
+    [[ -f $wg_conf ]] || { 
+        echo "File \"$wg_conf\" does not exist."
+        exit 1
+    } 
+
+    publickey=($(grep -oP '(?<=PublicKey = ).*' $wg_conf))
+    publickey_num=${#publickey[@]}
+
+    for i in $(seq 0 $publickey_num) ; do
+        [[ $i < $publickey_num ]] && {
+            key=${publickey[$i]} 
+            pubname+=([$(echo $key)]=$(grep -B1 "$key" $wg_conf | grep -oP '(?<=name = ).*'))
+        }
+    done
+}
+
+
+function show_configuration() {
+    local RICHOUTPUT=1;
+
+    if [[ ! -t 1 ]]; then
+        RICHOUTPUT=0
+    fi
+ 
+    script --flush --quiet /dev/null --command "wg show $wgname" | while read line ; do 
+  
+    if [[ $line == *"peer"* ]]; then
+        peerpk=$(printf '%s' "$line" | cut -c25- | cut -d $(echo -e '\033') -f1)
+        echo_line "$line" $RICHOUTPUT 1
+        peer=${pubname[$peerpk]}
+
+        if [[ "$peer" != "" ]]; then
+            echo_line "$(printf '%s' "$(tput bold)$(tput setaf 7)  name$(tput setaf 9)$(tput sgr0)")" $RICHOUTPUT 0
+            echo_line "$(printf '%s' ": $peer")" $RICHOUTPUT 1
+        fi
+    else
+        if [[ "$line" == *"interface"* ]]; then
+            echo_line "$line" $RICHOUTPUT 1
+        else
+            echo_line "  $line" $RICHOUTPUT 1
+        fi
+    fi
+
+    done
+}
+
+
+function echo_line() {
+    local outputline=$(printf '%s' "$1" | sed '$ s/\[\r\n]$//')
+
+    if [[ $2 -eq 0 ]]; then
+        outputline=$(printf '%s' "$outputline" | sed 's/\x1b\[[0-9]\{0,\}m\{0,1\}\x0f\{0,1\}//g')
+    fi
+
+    if [[ $3 -eq 0 ]]; then
+        printf '%s' "$outputline"
+    else
+        printf '%s\r\n' "$outputline"
+    fi
+}
+
+
+if [[ $# < 1 ]] ; then 
+    echo -e "\n    $0 WGNAME\n" 
+    exit 1
+else 
+    wgname=$1
+    ip addr show $wgname &> /dev/null || {
+        echo "Device \"$wgname\" does not exist."
+        exit 1
+    }
+    get_publickey_name
+    show_configuration
+fi 
