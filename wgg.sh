@@ -1,5 +1,8 @@
 #!/bin/bash
 # Provides a way to give wireguard peers a friendlier and more readable name.
+# /etc/wireguard/peers
+# format. PEER-PUBLIC-KEY:FRIENDLY PEER NAME
+# example. 0123456789abcdef0123456789abcdef0123456789a=:A friendly peer name
 
 PEERFILE=/etc/wireguard/peers
 WGCOMMAND=$(which wg)
