@@ -2,7 +2,7 @@
 # Wireguard friendly peer names
 
 # [Peer]
-# name = xxx
+# # name = xxx
 # PublicKey = xxx
 # PresharedKey = xxx
 # AllowedIPs = xxx
