@@ -12,7 +12,7 @@ declare -A pubname
 function get_publickey_name() {
     wg_conf="/etc/wireguard/${wgname}.conf"
 
-    [[ -f $wg_conf ]] || { 
+    [[ ! -f $wg_conf ]] && { 
         echo "File \"$wg_conf\" does not exist."
         exit 1
     } 
@@ -27,7 +27,6 @@ function get_publickey_name() {
         }
     done
 }
-
 
 function show_configuration() {
     local RICHOUTPUT=1;
@@ -58,7 +57,6 @@ function show_configuration() {
     done
 }
 
-
 function echo_line() {
     local outputline=$(printf '%s' "$1" | sed '$ s/\[\r\n]$//')
 
@@ -72,7 +70,6 @@ function echo_line() {
         printf '%s\r\n' "$outputline"
     fi
 }
-
 
 if [[ $# < 1 ]] ; then 
     echo -e "\n    $0 WGNAME\n" 
