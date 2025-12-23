@@ -118,8 +118,7 @@ if [[ "$IP_MODE" == "2" ]]; then
 	echo
 	read -rp "  IPv4 地址 (如 192.168.1.100): " IPADDR
 	read -rp "  子网前缀 (默认 24): " PREFIX
-	PREFIX="${PREFIX:-24}"
-	ADDR_CIDR="${IPADDR}/${PREFIX}"
+	ADDR_CIDR="${IPADDR}/${PREFIX:-24}"
 
 	read -rp "  配置默认网关? (y/N): " GW_YN
 	if [[ "$GW_YN" =~ ^[Yy]$ ]]; then
