@@ -2,7 +2,7 @@
 
 # Linux安全排查脚本
 # 适配RedHat系列Linux (Rocky Linux, CentOS, RHEL等)
-# 作者: Security Team
+# 作者: babyshen
 # 版本: 1.0
 
 # 颜色定义
